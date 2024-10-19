@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import { uploadVideo, processVideo } from '../services/api';
-import LoadingSpinner from './LoadingSpinner';
+import { Progress, Button, notification } from 'antd';
 
 const FileUpload = ({ setInsights }) => {
   const [file, setFile] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -14,51 +13,39 @@ const FileUpload = ({ setInsights }) => {
 
   const handleUpload = async () => {
     if (!file) {
-      setErrorMessage('Please select a video file.');
+      notification.error({ message: 'Please select a video file' });
       return;
     }
 
-    setErrorMessage('');
     setLoading(true);
+    setProgress(0);
 
     try {
-      const uploadResponse = await uploadVideo(file);
-      const videoName = file.name;
+      const uploadResponse = await uploadVideo(file, (event) => {
+        const percent = Math.round((event.loaded * 100) / event.total);
+        setProgress(percent);
+      });
 
-      // Start processing video after upload
+      const videoName = file.name;
       const processResponse = await processVideo(videoName);
       setInsights(processResponse.data.insights);
 
+      notification.success({ message: 'Video processed successfully!' });
     } catch (error) {
-      setErrorMessage('Error uploading or processing the video.');
+      notification.error({ message: 'Error uploading or processing the video' });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-center">Upload Your Video</h2>
-      <div className="mb-4">
-        <input
-          type="file"
-          onChange={handleFileChange}
-          className="w-full p-2 border border-gray-300 rounded-md"
-        />
-      </div>
-      {loading ? (
-        <LoadingSpinner />
-      ) : (
-        <button
-          onClick={handleUpload}
-          className="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
-        >
-          Upload & Process
-        </button>
-      )}
-      {errorMessage && (
-        <p className="mt-4 text-red-600 text-center">{errorMessage}</p>
-      )}
+    <div className="p-6 bg-white rounded shadow">
+      <h2 className="text-xl font-bold mb-4">Upload and Process Video</h2>
+      <input type="file" onChange={handleFileChange} className="mb-4" />
+      <Progress percent={progress} className="mb-4" />
+      <Button type="primary" onClick={handleUpload} loading={loading} block>
+        Upload and Process
+      </Button>
     </div>
   );
 };

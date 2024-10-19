@@ -1,17 +1,14 @@
 import axios from 'axios';
+// Get API URL from environment variables
+const API_URL = process.env.REACT_APP_API_URL;
 
-const API_URL = 'http://localhost:5000'; // Adjust the URL for your Flask backend
-
-export const uploadVideo = async (file) => {
+export const uploadVideo = async (file, onUploadProgress) => {
   const formData = new FormData();
   formData.append('video', file);
   
   return axios.post(`${API_URL}/upload`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
-    onUploadProgress: (progressEvent) => {
-      const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-      console.log(`Upload Progress: ${progress}%`);
-    },
+    onUploadProgress,
   });
 };
 
