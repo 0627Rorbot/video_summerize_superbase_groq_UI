@@ -12,7 +12,7 @@ function App() {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sidebar />
+     <Sidebar />
       <Layout>
         <AppHeader />
         <Content style={{ margin: '24px 16px 0' }}>

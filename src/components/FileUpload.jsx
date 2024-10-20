@@ -43,7 +43,7 @@ const FileUpload = ({ setInsights }) => {
       <h2 className="text-xl font-bold mb-4">Upload and Process Video</h2>
       <input type="file" onChange={handleFileChange} className="mb-4" />
       <Progress percent={progress} className="mb-4" />
-      <Button type="primary" onClick={handleUpload} loading={loading} block>
+      <Button type="primary" className="p-6 text-xl" onClick={handleUpload} loading={loading} block>
         Upload and Process
       </Button>
     </div>
